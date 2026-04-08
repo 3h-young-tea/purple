@@ -98,7 +98,7 @@ public:
 
 		char *x = new char[len_ + y.len_ + 1];
 		std::copy(s_, s_ + len_, x);
-		std::swap(s_, x);	// "愤怒的认了真 抱着怨恨转了个身" -- mc webber [<peking bad boi>](https://music.douban.com/subject/1407733/)
+		std::swap(s_, x);	// "ok, 这个哥们现在换到这边, 我听你的说唱就像是在转圈" -- iron mic 2012, 艾热 vs 贝贝
 		delete[] x;
 		std::copy(y.s_, y.s_ + 1 + y.len_, s_ + len_);
 		len_ += y.len_;
@@ -113,7 +113,7 @@ public:
 		std::size_t s_len = std::strlen(s);
 		char *x = new char[len_ + s_len + 1];
 		std::copy(s_, s_ + len_, x);
-		std::swap(s_, x);	// "愤怒的认了真 抱着怨恨转了个身" -- mc webber [<peking bad boi>](https://music.douban.com/subject/1407733/)
+		std::swap(s_, x);	// "ok, 这个哥们现在换到这边, 我听你的说唱就像是在转圈" -- iron mic 2012, 艾热 vs 贝贝
 		delete[] x;
 		std::copy(s, s + 1 + s_len, s_ + len_);
 		len_ += s_len;
