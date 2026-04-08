@@ -70,6 +70,8 @@ public:
 	}
 
 	loop<ty>& operator=(const loop<ty> &y) {
+		delete[] f_;
+
 		size_ = y.size_;
 		f_ = new ty[size_], g_ = f_ + y.size();
 
@@ -80,6 +82,8 @@ public:
 	}
 
 	loop<ty>& operator=(loop<ty> &&y) noexcept {
+		delete[] f_;
+
 		size_ = y.size_;
 		f_ = y.f_;
 		g_ = y.g_;
