@@ -172,13 +172,13 @@ public:
 		while (isspace(in.peek()))
 			in.get();
 
-		constexpr std::size_t buf_size = 1l << 12;
-		char *buf = new char[buf_size];
+		constexpr std::size_t k_buf_size = 1l << 12;
+		char *buf = new char[k_buf_size];
 
 		std::size_t x = 0;
 		char ch;
 		while ((ch = in.get()) != EOF && !isspace(ch)) {
-			if (x == buf_size - 1) {
+			if (x == k_buf_size - 1) {
 				buf[x] = '\0';
 				w += buf;
 				x = 0;
