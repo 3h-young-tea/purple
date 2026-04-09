@@ -293,22 +293,22 @@ public:
 	}
 
 	ty*	operator->(void) noexcept
-		pre(x_) {
+		pre(x_) {	// pre(x_ && std::is_within_lifetime(x_))
 		return x_;
 	}
 
 	const ty* operator->(void) const noexcept
-		pre(x_) {
+		pre(x_) {	// pre(x_ && std::is_within_lifetime(x_))
 		return x_;
 	}
 
 	ty&	operator*(void)
-		pre(x_) {
+		pre(x_) {	// pre(x_ && std::is_within_lifetime(x_))
 		return *x_;
 	}
 
 	const ty& operator*(void) const noexcept
-		pre(x_) {
+		pre(x_) {	// pre(x_ && std::is_within_lifetime(x_))
 		return *x_;
 	}
 };
