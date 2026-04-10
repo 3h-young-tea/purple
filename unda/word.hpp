@@ -21,12 +21,6 @@ public:
 		: len_(0uz),
 		s_(nullptr) {}
 
-	explicit word(const char *s)
-		: len_(std::strlen(s)),
-		s_(new char[len_ + 1]) {
-		std::copy(s, s + 1 + len_, s_);
-	}
-
 	word(const word &y)
 		: len_(y.len_),
 		s_(new char[len_ + 1]) {
@@ -40,6 +34,12 @@ public:
 		y.s_ = nullptr;
 	}
 
+	explicit word(const char *s)
+		: len_(std::strlen(s)),
+		s_(new char[len_ + 1]) {
+		std::copy(s, s + 1 + len_, s_);
+	}
+
 	~word(void) noexcept {
 		len_ = 0;
 		delete[] s_;
@@ -51,6 +51,17 @@ public:
 		len_ = y.len_;
 		s_ = new char[len_ + 1];
 		std::copy(y.s_, y.s_ + 1 + y.len_, s_);
+
+		return *this;
+	}
+
+	word&	operator=(word &&y) noexcept {
+		delete[] s_;
+
+		len_ = y.len_;
+		s_ = y.s_;
+		y.len_ = 0uz;
+		y.s_ = nullptr;
 
 		return *this;
 	}
@@ -77,11 +88,16 @@ public:
 	}
 
 	bool	operator==(const char *s) const noexcept {
-		for (std::size_t x = 0; s_[x] && s[x]; ++x)
+		std::size_t x = 0;
+
+		while (s_[x] && s[x]) {
 			if (s_[x] != s[x])
 				return 0;
 
-		return 1;
+			x++;
+		}
+
+		return s_[x] == s[x];
 	}
 
 	bool	operator!=(const word &y) const noexcept {
@@ -89,18 +105,23 @@ public:
 			return 1;
 
 		for (std::size_t x = 0; s_[x]; ++x)
-			if (s_[x] == y.s_[x])
-				return 0;
+			if (s_[x] != y.s_[x])
+				return 1;
 
-		return 1;
+		return 0;
 	}
 
 	bool	operator!=(const char *s) const noexcept {
-		for (std::size_t x = 0; s_[x] && s[x]; ++x)
-			if (s_[x] == s[x])
-				return 0;
+		std::size_t x = 0;
 
-		return 1;
+		while (s_[x] && s[x]) {
+			if (s_[x] != s[x])
+				return 1;
+
+			x++;
+		}
+
+		return s_[x] != s[x];
 	}
 
 	word	operator+(const word &y) const {
