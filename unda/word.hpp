@@ -65,6 +65,44 @@ public:
 		return *this;
 	}
 
+	bool	operator==(const word &y) const noexcept {
+		if (len_ != y.len_)
+			return 0;
+
+		for (std::size_t x = 0; s_[x]; ++x)
+			if (s_[x] != y.s_[x])
+				return 0;
+
+		return 1;
+	}
+
+	bool	operator==(const char *s) const noexcept {
+		for (std::size_t x = 0; s_[x] && s[x]; ++x)
+			if (s_[x] != s[x])
+				return 0;
+
+		return 1;
+	}
+
+	bool	operator!=(const word &y) const noexcept {
+		if (len_ != y.len_)
+			return 1;
+
+		for (std::size_t x = 0; s_[x]; ++x)
+			if (s_[x] == y.s_[x])
+				return 0;
+
+		return 1;
+	}
+
+	bool	operator!=(const char *s) const noexcept {
+		for (std::size_t x = 0; s_[x] && s[x]; ++x)
+			if (s_[x] == s[x])
+				return 0;
+
+		return 1;
+	}
+
 	word	operator+(const word &y) const {
 		if (len_ == 0)
 			return y;
@@ -165,33 +203,34 @@ public:
 		return s_;
 	}
 
-	friend
-	std::istream& operator>>(std::istream &in, word &w) {
-		w = "";
+	template <class ty>
+	friend ty& operator>>(ty &in, word &w) {
+		int ch;
 
-		while (isspace(in.peek()))
+		while ((ch = in.peek()) != EOF && isspace(ch))
 			in.get();
 
-		constexpr std::size_t k_buf_size = 1l << 12;
-		char *buf = new char[k_buf_size];
+		if (!in.eof() && (ch = in.peek()) == EOF) {
+			in.setstate(std::ios::failbit);
+			return in;
+		}
+
+		std::size_t buf_size = 1l << 12;
+		char *buf = static_cast<char*>(std::malloc(buf_size));
 
 		std::size_t x = 0;
-		char ch;
-		while ((ch = in.get()) != EOF && !isspace(ch)) {
-			if (x == k_buf_size - 1) {
-				buf[x] = '\0';
-				w += buf;
-				x = 0;
-			}
+		while ((ch = in.get()) && !in.eof() && !isspace(ch)) {
+			if (x == buf_size - 1)
+				buf = static_cast<char*>(std::realloc(buf, buf_size <<= 1));
 
-			buf[x++] = ch;
+			buf[x++] = static_cast<char>(ch);
 		}
 
 		buf[x] = '\0';
-		w += buf;
-		delete[] buf;
+		w = buf;
+		std::free(buf);
 
-		if (x == 0 && ch == EOF)
+		if (x == 0 && ch && !in.eof())
 			in.setstate(std::ios::failbit);
 
 		return in;
