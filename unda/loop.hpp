@@ -63,9 +63,6 @@ public:
 	}
 
 	~loop(void) noexcept {
-		for (std::size_t x = 0; x < size(); ++x)
-			f_[x].~ty();
-
 		delete[] f_;
 	}
 
