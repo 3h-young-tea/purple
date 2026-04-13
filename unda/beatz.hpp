@@ -101,6 +101,8 @@ class	sobj_t {	// super object
 	ty *x_;
 	std::atomic<std::size_t> *tot_;
 
+	friend class robj_t<ty>;
+
 public:
 	sobj_t(void)
 		: x_(nullptr), tot_(nullptr) {}
@@ -147,9 +149,6 @@ public:
 	}
 
 	sobj_t<ty>& operator=(const robj_t<ty> &y) {
-		if (this == &y)
-			return *this;
-
 		pop();
 		x_ = y.x_;
 		tot_ = y.tot_;
@@ -235,6 +234,8 @@ class	robj_t {	// rare object
 	ty *x_;
 	std::atomic<std::size_t> *tot_;
 
+	friend class sobj_t<ty>;
+
 public:
 	robj_t(void)
 		: x_(nullptr), tot_(nullptr) {}
@@ -267,9 +268,6 @@ public:
 	}
 
 	robj_t<ty>& operator=(const sobj_t<ty> &y) {
-		if (this == &y)
-			return *this;
-
 		x_ = y.x_;
 		tot_ = y.tot_;
 
