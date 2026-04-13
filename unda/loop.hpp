@@ -44,7 +44,7 @@ public:
 		: size_(32),
 		f_(static_cast<ty*>(std::calloc(sizeof(ty), size_))), g_(f_) {}
 
-	loop(std::size_t len)
+	explicit loop(std::size_t len)
 		: size_(len * 2),
 		f_(static_cast<ty*>(std::calloc(sizeof(ty), size_))), g_(f_ + len) {
 		for (std::size_t x = 0uz; x < size(); ++x)
@@ -66,11 +66,11 @@ public:
 	}
 
 	~loop(void) noexcept {
-		std::free(f_);
+		clear();
 	}
 
 	loop<ty>& operator=(const loop<ty> &y) {
-		std::free(f_);
+		clear();
 
 		size_ = y.size_;
 		f_ = static_cast<ty*>(std::calloc(sizeof(ty), size_));
@@ -86,7 +86,7 @@ public:
 		if (this == &y)
 			return *this;
 
-		std::free(f_);
+		clear();
 
 		size_ = y.size_;
 		f_ = y.f_;
@@ -135,6 +135,15 @@ public:
 
 	bool empty(void) const noexcept {
 		return g_ <= f_;
+	}
+
+	void	clear(void) noexcept {
+		for (std::size_t x = 0uz; x < size(); ++x)
+			f_[x].~ty();
+
+		std::free(f_);
+		size_ = 0;
+		f_ = g_ = nullptr;
 	}
 
 	ty*	begin(void) const {
