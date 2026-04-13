@@ -24,16 +24,7 @@ public:
 	interact(args&&...arg)
 		: val_(make_uobj<ty>(std::forward<args>(arg)...)) {}
 
-	~interact(void) noexcept {
-		if (!pre_) {
-			while (nxt_)
-				nxt_->rm();
-
-			return;
-		}
-
-		rm();
-	}
+	~interact(void) noexcept {}
 
 	template <class ref_ty, class...args>
 	void	touch(const ref_ty &ref_this, args&&...arg)
@@ -42,8 +33,8 @@ public:
 		x->pre_ = ref_this;
 		x->nxt_ = std::move(nxt_);
 
-		if (nxt_)
-			nxt_->pre_ = x;
+		if (x->nxt_)
+			x->nxt_->pre_ = x;
 
 		nxt_ = x;
 	}
@@ -51,9 +42,10 @@ public:
 	void	rm(void) noexcept
 		pre(pre_) {
 		if (nxt_)
-			nxt_->pre_ = std::move(pre_);
+			nxt_->pre_ = pre_;
 
-		pre_->nxt_ = std::move(nxt_);
+		auto tmp = nxt_;
+		pre_->nxt_ = tmp;
 	}
 
 	bool	has_ring(void) const noexcept
