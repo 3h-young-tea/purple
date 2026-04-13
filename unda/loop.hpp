@@ -23,39 +23,40 @@ class	loop {
 
 		if (size_ == 0uz) {
 			size_ = 32;
-			f_ = new ty[size_];
+			f_ = static_cast<ty*>(std::calloc(sizeof(ty), size_));
 			g_ = f_;
 			return;
 		}
 
-		ty *p = new ty[size_ <<= 1];
+		ty *p = static_cast<ty*>(std::calloc(sizeof(ty), size_ <<= 1));
 
 		for (std::size_t x = 0uz; x < size(); ++x)
-			new (p + x) ty(std::move(f_[x]));
+			new (p + x) ty(std::move(f_[x])),
+			f_[x].~ty();
 
 		g_ = p + size();
-		delete[] f_;
+		std::free(f_);
 		f_ = p;
 	}
 
 public:
 	loop(void)
 		: size_(32),
-		f_(new ty[size_]), g_(f_) {}
+		f_(static_cast<ty*>(std::calloc(sizeof(ty), size_))), g_(f_) {}
 
 	loop(std::size_t len)
 		: size_(len * 2),
-		f_(new ty[size_]), g_(f_ + len) {
+		f_(static_cast<ty*>(std::calloc(sizeof(ty), size_))), g_(f_ + len) {
 	}
 
 	loop(const loop &y)
 		: size_(y.size_),
-		f_(new ty[size_]), g_(f_ + y.size()) {
+		f_(static_cast<ty*>(std::calloc(sizeof(ty), size_))), g_(f_ + y.size()) {
 		for (std::size_t x = 0uz; x < size(); ++x)
 			new (f_ + x) ty(y.f_[x]);
 	}
 
-	loop(loop &&y)
+	loop(loop &&y) noexcept
 		: size_(y.size_),
 		f_(y.f_), g_(y.g_) {
 		y.size_ = 0uz;
@@ -63,14 +64,15 @@ public:
 	}
 
 	~loop(void) noexcept {
-		delete[] f_;
+		std::free(f_);
 	}
 
 	loop<ty>& operator=(const loop<ty> &y) {
-		delete[] f_;
+		std::free(f_);
 
 		size_ = y.size_;
-		f_ = new ty[size_], g_ = f_ + y.size();
+		f_ = static_cast<ty*>(std::calloc(sizeof(ty), size_));
+		g_ = f_ + y.size();
 
 		for (std::size_t x = 0uz; x < size(); ++x)
 			new (f_ + x) ty(y.f_[x]);
@@ -79,7 +81,10 @@ public:
 	}
 
 	loop<ty>& operator=(loop<ty> &&y) noexcept {
-		delete[] f_;
+		if (this == &y)
+			return *this;
+
+		std::free(f_);
 
 		size_ = y.size_;
 		f_ = y.f_;
