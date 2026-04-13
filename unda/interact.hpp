@@ -22,7 +22,7 @@ public:
 
 	template <class...args>
 	interact(args&&...arg)
-		: val_(std::forward<args>(arg)...) {}
+		: val_(make_uobj<ty>(std::forward<args>(arg)...)) {}
 
 	~interact(void) noexcept {
 		if (!pre_) {
@@ -38,9 +38,9 @@ public:
 	template <class ref_ty, class...args>
 	void	touch(const ref_ty &ref_this, args&&...arg)
 		pre(&*ref_this == this) {
-		sobj_t<interact<ty>> x(std::forward<args>(arg)...);
+		sobj_t<interact<ty>> x = make_sobj<interact<ty>>(std::forward<args>(arg)...);
 		x->pre_ = ref_this;
-		x->nxt_ = nxt_;
+		x->nxt_ = std::move(nxt_);
 
 		if (nxt_)
 			nxt_->pre_ = x;
@@ -51,9 +51,9 @@ public:
 	void	rm(void) noexcept
 		pre(pre_) {
 		if (nxt_)
-			nxt_->pre_ = pre_;
+			nxt_->pre_ = std::move(pre_);
 
-		pre_->nxt_ = nxt_;
+		pre_->nxt_ = std::move(nxt_);
 	}
 
 	bool	has_ring(void) const noexcept
