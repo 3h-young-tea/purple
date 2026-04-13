@@ -86,6 +86,13 @@ public:
 		return *x_;
 	}
 
+	template <class typ>
+	friend uobj_t<typ> make_uobj(void) {
+		uobj_t<typ> x;
+		x.x_ = new typ();
+		return x;
+	}
+
 	template <class typ, class...args>
 	friend uobj_t<typ> make_uobj(args&&...val) {
 		uobj_t<typ> x;
@@ -93,6 +100,9 @@ public:
 		return x;
 	}
 };
+
+template <class typ>
+uobj_t<typ> make_uobj(void);
 
 template <class typ, class...args>
 uobj_t<typ> make_uobj(args&&...);
@@ -216,6 +226,14 @@ public:
 		return *x_;
 	}
 
+	template <class typ>
+	friend sobj_t<typ> make_sobj(void) {
+		sobj_t<typ> x;
+		x.x_ = new typ();
+		x.tot_ = new std::atomic<std::size_t>(1uz);
+		return x;
+	}
+
 	template <class typ, class...args>
 	friend sobj_t<typ> make_sobj(args&&...val) {
 		sobj_t<typ> x;
@@ -224,6 +242,9 @@ public:
 		return x;
 	}
 };
+
+template <class typ>
+sobj_t<typ> make_sobj(void);
 
 template <class typ, class...args>
 sobj_t<typ> make_sobj(args&&...);
