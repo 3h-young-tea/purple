@@ -47,6 +47,8 @@ public:
 	loop(std::size_t len)
 		: size_(len * 2),
 		f_(static_cast<ty*>(std::calloc(sizeof(ty), size_))), g_(f_ + len) {
+		for (std::size_t x = 0uz; x < size(); ++x)
+			new (f_ + x) ty();
 	}
 
 	loop(const loop &y)
