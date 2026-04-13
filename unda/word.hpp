@@ -199,7 +199,7 @@ public:
 	}
 
 	loop<std::size_t> border(void) const noexcept 
-		[[pre: len_]] {
+		pre(len_) {
 		loop<std::size_t> pi(len_);
 		pi[0uz] = 0uz;
 
