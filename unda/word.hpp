@@ -34,14 +34,21 @@ public:
 		y.s_ = nullptr;
 	}
 
+	explicit word(const std::string &y)
+		: len_(y.length()),
+		s_(new char[len_ + 1]) {
+		std::copy(y.begin(), y.end(), s_);
+	}
+
 	explicit word(const char *s)
+		pre(s)
 		: len_(std::strlen(s)),
 		s_(new char[len_ + 1]) {
 		std::copy(s, s + 1 + len_, s_);
 	}
 
 	~word(void) noexcept {
-		len_ = 0;
+		len_ = 0uz;
 		delete[] s_;
 	}
 
@@ -66,7 +73,18 @@ public:
 		return *this;
 	}
 
-	word&	operator=(const char *s) {
+	word&	operator=(const std::string &y) {
+		delete[] s_;
+
+		len_ = y.length();
+		s_ = new char[len_ + 1];
+		std::copy(y.begin(), y.end(), s_);
+
+		return *this;
+	}
+
+	word&	operator=(const char *s)
+		pre(s) {
 		delete[] s_;
 
 		len_ = std::strlen(s);
@@ -80,7 +98,7 @@ public:
 		if (len_ != y.len_)
 			return 0;
 
-		for (std::size_t x = 0; s_[x]; ++x)
+		for (std::size_t x = 0uz; s_[x]; ++x)
 			if (s_[x] != y.s_[x])
 				return 0;
 
@@ -88,7 +106,7 @@ public:
 	}
 
 	bool	operator==(const char *s) const noexcept {
-		std::size_t x = 0;
+		std::size_t x = 0uz;
 
 		while (s_[x] && s[x]) {
 			if (s_[x] != s[x])
@@ -104,7 +122,7 @@ public:
 		if (len_ != y.len_)
 			return 1;
 
-		for (std::size_t x = 0; s_[x]; ++x)
+		for (std::size_t x = 0uz; s_[x]; ++x)
 			if (s_[x] != y.s_[x])
 				return 1;
 
@@ -112,7 +130,7 @@ public:
 	}
 
 	bool	operator!=(const char *s) const noexcept {
-		std::size_t x = 0;
+		std::size_t x = 0uz;
 
 		while (s_[x] && s[x]) {
 			if (s_[x] != s[x])
@@ -125,7 +143,7 @@ public:
 	}
 
 	word	operator+(const word &y) const {
-		if (len_ == 0)
+		if (len_ == 0uz)
 			return y;
 
 		word x;
@@ -138,7 +156,7 @@ public:
 	}
 
 	word	operator+(const char *s) const {
-		if (len_ == 0)
+		if (len_ == 0uz)
 			return word(s);
 
 		std::size_t s_len = std::strlen(s);
@@ -152,7 +170,7 @@ public:
 	}
 
 	word&	operator+=(const word &y) {
-		if (len_ == 0)
+		if (len_ == 0uz)
 			return *this = y;
 
 		char *x = new char[len_ + y.len_ + 1];
@@ -166,7 +184,7 @@ public:
 	}
 
 	word&	operator+=(const char *s) {
-		if (len_ == 0)
+		if (len_ == 0uz)
 			return *this = word(s);
 
 		std::size_t s_len = std::strlen(s);
@@ -181,9 +199,9 @@ public:
 	}
 
 	loop<std::size_t> border(void) const noexcept 
-		pre(len_) {
+		[[pre: len_]] {
 		loop<std::size_t> pi(len_);
-		pi[0] = 0uz;
+		pi[0uz] = 0uz;
 
 		for (std::size_t x = 1uz, y = 0uz; x < len_; ++x) {
 			while (y && s_[y] != s_[x])
@@ -239,7 +257,7 @@ public:
 		std::size_t buf_size = 1l << 12;
 		char *buf = static_cast<char*>(std::malloc(buf_size));
 
-		std::size_t x = 0;
+		std::size_t x = 0uz;
 		while ((ch = in.get()) && !in.eof() && !isspace(ch)) {
 			if (x == buf_size - 1)
 				buf = static_cast<char*>(std::realloc(buf, buf_size <<= 1));
@@ -251,7 +269,7 @@ public:
 		w = buf;
 		std::free(buf);
 
-		if (x == 0 && ch && !in.eof())
+		if (x == 0uz && ch && !in.eof())
 			in.setstate(std::ios::failbit);
 
 		return in;
