@@ -21,7 +21,7 @@ class	loop {
 		if (g_ < f_ + size_ - 1)
 			return;
 
-		if (size_ == 0) {
+		if (size_ == 0uz) {
 			size_ = 32;
 			f_ = new ty[size_];
 			g_ = f_;
@@ -30,7 +30,7 @@ class	loop {
 
 		ty *p = new ty[size_ <<= 1];
 
-		for (std::size_t x = 0; x < size(); ++x)
+		for (std::size_t x = 0uz; x < size(); ++x)
 			new (p + x) ty(std::move(f_[x]));
 
 		g_ = p + size();
@@ -51,14 +51,14 @@ public:
 	loop(const loop &y)
 		: size_(y.size_),
 		f_(new ty[size_]), g_(f_ + y.size()) {
-		for (std::size_t x = 0; x < size(); ++x)
+		for (std::size_t x = 0uz; x < size(); ++x)
 			new (f_ + x) ty(y.f_[x]);
 	}
 
 	loop(loop &&y)
 		: size_(y.size_),
 		f_(y.f_), g_(y.g_) {
-		y.size_ = 0;
+		y.size_ = 0uz;
 		y.f_ = y.g_ = nullptr;
 	}
 
@@ -72,7 +72,7 @@ public:
 		size_ = y.size_;
 		f_ = new ty[size_], g_ = f_ + y.size();
 
-		for (std::size_t x = 0; x < size(); ++x)
+		for (std::size_t x = 0uz; x < size(); ++x)
 			new (f_ + x) ty(y.f_[x]);
 
 		return *this;
@@ -84,7 +84,7 @@ public:
 		size_ = y.size_;
 		f_ = y.f_;
 		g_ = y.g_;
-		y.size_ = 0;
+		y.size_ = 0uz;
 		y.f_ = y.g_ = nullptr;
 
 		return *this;
