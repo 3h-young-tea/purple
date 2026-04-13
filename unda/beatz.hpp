@@ -22,17 +22,13 @@ class	uobj_t {	// ultra object
 	void operator=(const uobj_t<ty>&) = delete;
 
 public:
-	uobj_t(void)
+	uobj_t(void) noexcept
 		: x_(nullptr) {}
 
 	uobj_t(uobj_t<ty> &&y) noexcept
 		: x_(y.x_) {
 		y.x_ = nullptr;
 	}
-
-	template <class...args>
-	explicit uobj_t(args&&...val)
-		: x_(new ty(std::forward<args>(val)...)) {}
 
 	~uobj_t(void) noexcept {
 		pop();
@@ -56,12 +52,6 @@ public:
 	void	push(const ty &val) {
 		pop();
 		x_ = new ty(val);
-	}
-
-	template <class...args>
-	void	emplace(args&&...val) {
-		pop();
-		x_ = new ty(std::forward<args>(val)...);
 	}
 
 	void	pop(void) noexcept {
@@ -95,7 +85,17 @@ public:
 		pre(x_) {
 		return *x_;
 	}
+
+	template <class typ, class...args>
+	friend uobj_t<typ> make_uobj(args&&...val) {
+		uobj_t<typ> x;
+		x.x_ = new typ(std::forward<args&&>(val)...);
+		return x;
+	}
 };
+
+template <class typ, class...args>
+uobj_t<typ> make_uobj(args&&...);
 
 template <class ty>
 class	robj_t;
@@ -108,16 +108,16 @@ class	sobj_t {	// super object
 	friend class robj_t<ty>;
 
 public:
-	sobj_t(void)
+	sobj_t(void) noexcept
 		: x_(nullptr), tot_(nullptr) {}
 
-	sobj_t(const sobj_t<ty> &y)
+	sobj_t(const sobj_t<ty> &y) noexcept
 		: x_(y.x_), tot_(y.tot_) {
 		if (x_)
 			tot_->fetch_add(1uz, std::memory_order::relaxed);
 	}
 
-	sobj_t(const robj_t<ty> &y)
+	sobj_t(const robj_t<ty> &y) noexcept
 		: x_(y.x_), tot_(y.tot_) {
 		if (x_)
 			tot_->fetch_add(1uz, std::memory_order::relaxed);
@@ -129,16 +129,11 @@ public:
 		y.tot_ = nullptr;
 	}
 
-	template <class...args>
-	explicit sobj_t(args&&...val)
-		: x_(new ty(std::forward<args>(val)...)),
-		tot_(new std::atomic<std::size_t>(1uz)) {}
-
 	~sobj_t(void) noexcept {
 		pop();
 	}
 
-	sobj_t<ty>& operator=(const sobj_t<ty> &y) {
+	sobj_t<ty>& operator=(const sobj_t<ty> &y) noexcept {
 		if (this == &y)
 			return *this;
 
@@ -152,7 +147,7 @@ public:
 		return *this;
 	}
 
-	sobj_t<ty>& operator=(const robj_t<ty> &y) {
+	sobj_t<ty>& operator=(const robj_t<ty> &y) noexcept {
 		pop();
 		x_ = y.x_;
 		tot_ = y.tot_;
@@ -184,19 +179,6 @@ public:
 		return x_ < y.x_;
 	}
 
-	void	push(const ty &val) {
-		pop();
-		x_ = new ty(val);
-		tot_ = new std::atomic<std::size_t>(1uz);
-	}
-
-	template <class...args>
-	void	emplace(args&&...val) {
-		pop();
-		x_ = new ty(std::forward<args>(val)...);
-		tot_ = new std::atomic<std::size_t>(1uz);
-	}
-
 	void	pop(void) noexcept {
 		if (x_ == nullptr)
 			return;
@@ -224,7 +206,7 @@ public:
 		return x_;
 	}
 
-	ty&	operator*(void)
+	ty&	operator*(void) noexcept
 		pre(x_) {
 		return *x_;
 	}
@@ -233,7 +215,18 @@ public:
 		pre(x_) {
 		return *x_;
 	}
+
+	template <class typ, class...args>
+	friend sobj_t<typ> make_sobj(args&&...val) {
+		sobj_t<typ> x;
+		x.x_ = new typ(std::forward<args>(val)...);
+		x.tot_ = new std::atomic<std::size_t>(1uz);
+		return x;
+	}
 };
+
+template <class typ, class...args>
+sobj_t<typ> make_sobj(args&&...);
 
 /*	这个 rare object 的语义是, 我拥有这个东西, 但是我拒绝参与引用计数
  *	简单来说, 我拥有这个东西, 那我就不应该是观察者, i`m da masta
@@ -249,13 +242,13 @@ class	robj_t {	// rare object
 	friend class sobj_t<ty>;
 
 public:
-	robj_t(void)
+	robj_t(void) noexcept
 		: x_(nullptr), tot_(nullptr) {}
 
-	robj_t(const robj_t<ty> &y)
+	robj_t(const robj_t<ty> &y) noexcept
 		: x_(y.x_), tot_(y.tot_) {}
 
-	robj_t(const sobj_t<ty> &y)
+	robj_t(const sobj_t<ty> &y) noexcept
 		: x_(y.x_), tot_(y.tot_) {}
 
 	robj_t(robj_t<ty> &&y) noexcept
@@ -264,12 +257,12 @@ public:
 		y.tot_ = nullptr;
 	}
 
-	~robj_t(void) {
+	~robj_t(void) noexcept {
 		x_ = nullptr;
 		tot_ = nullptr;
 	}
 
-	robj_t<ty>& operator=(const robj_t<ty> &y) {
+	robj_t<ty>& operator=(const robj_t<ty> &y) noexcept {
 		if (this == &y)
 			return *this;
 
@@ -279,7 +272,7 @@ public:
 		return *this;
 	}
 
-	robj_t<ty>& operator=(const sobj_t<ty> &y) {
+	robj_t<ty>& operator=(const sobj_t<ty> &y) noexcept {
 		x_ = y.x_;
 		tot_ = y.tot_;
 
@@ -320,7 +313,7 @@ public:
 		return x_;
 	}
 
-	ty&	operator*(void)
+	ty&	operator*(void) noexcept
 		pre(x_) {	// pre(x_ && std::is_within_lifetime(x_))
 		return *x_;
 	}
