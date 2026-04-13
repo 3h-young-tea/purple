@@ -49,6 +49,10 @@ public:
 		return *this;
 	}
 
+	bool	operator<(const uobj_t<ty> &y) const noexcept {
+		return x_ < y.x_;
+	}
+
 	void	push(const ty &val) {
 		pop();
 		x_ = new ty(val);
@@ -172,6 +176,14 @@ public:
 		return *this;
 	}
 
+	bool	operator<(const sobj_t<ty> &y) const noexcept {
+		return x_ < y.x_;
+	}
+
+	bool	operator<(const robj_t<ty> &y) const noexcept {
+		return x_ < y.x_;
+	}
+
 	void	push(const ty &val) {
 		pop();
 		x_ = new ty(val);
@@ -284,6 +296,14 @@ public:
 		y.tot_ = nullptr;
 
 		return *this;
+	}
+
+	bool	operator<(const robj_t<ty> &y) const noexcept {
+		return x_ < y.x_;
+	}
+
+	bool	operator<(const sobj_t<ty> &y) const noexcept {
+		return x_ < y.x_;
 	}
 
 	explicit operator bool(void) const noexcept {
