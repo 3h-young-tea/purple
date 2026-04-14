@@ -35,6 +35,19 @@ public:
 		nxt_ = x;
 	}
 
+	template <class...args>
+	void	touch(const std::weak_ptr<interact<ty>> &ref_this, args&&...arg)
+		pre(&*ref_this.lock() == this) {
+		auto x = std::make_shared<interact<ty>>(std::forward<args>(arg)...);
+		x->pre_ = ref_this.lock();
+		x->nxt_ = std::move(nxt_);
+
+		if (x->nxt_)
+			x->nxt_->pre_ = x;
+
+		nxt_ = x;
+	}
+
 	void	rm(void) noexcept
 		pre(pre_.lock()) {
 		if (nxt_)
