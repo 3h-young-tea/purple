@@ -24,7 +24,7 @@ public:
 	interact(args&&...arg)
 		: val_(make_uobj<ty>(std::forward<args>(arg)...)) {}
 
-	~interact(void) noexcept {}
+	~interact(void) noexcept {std::println("{}", *val_);}
 
 	template <class ref_ty, class...args>
 	void	touch(const ref_ty &ref_this, args&&...arg)
@@ -44,8 +44,7 @@ public:
 		if (nxt_)
 			nxt_->pre_ = pre_;
 
-		auto tmp = nxt_;
-		pre_->nxt_ = tmp;
+		pre_->nxt_ = nxt_;
 	}
 
 	bool	has_ring(void) const noexcept
