@@ -13,7 +13,7 @@ using namespace std::literals;
 namespace unda {
 // https://music.douban.com/subject/30305164/	// dirty moss - interact
 
-template<class ty>
+template <class ty>
 class	interact {
 public:
 	robj_t<interact<ty>> pre_;
