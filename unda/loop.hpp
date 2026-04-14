@@ -14,21 +14,21 @@ namespace unda {
 
 template <class ty>
 class	loop {
-	std::size_t size_;
+	std::size_t capacity_;
 	ty *f_, *g_;
 
 	void	check_it(void) {
-		if (g_ < f_ + size_ - 1)
+		if (g_ < f_ + capacity_ - 1)
 			return;
 
-		if (size_ == 0uz) {
-			size_ = 32;
-			f_ = static_cast<ty*>(std::calloc(sizeof(ty), size_));
+		if (capacity_ == 0uz) {
+			capacity_ = 32;
+			f_ = static_cast<ty*>(std::calloc(sizeof(ty), capacity_));
 			g_ = f_;
 			return;
 		}
 
-		ty *p = static_cast<ty*>(std::calloc(sizeof(ty), size_ <<= 1));
+		ty *p = static_cast<ty*>(std::calloc(sizeof(ty), capacity_ <<= 1));
 
 		for (std::size_t x = 0uz; x < size(); ++x)
 			new (p + x) ty(std::move(f_[x])),
@@ -41,27 +41,27 @@ class	loop {
 
 public:
 	loop(void)
-		: size_(32),
-		f_(static_cast<ty*>(std::calloc(sizeof(ty), size_))), g_(f_) {}
+		: capacity_(32),
+		f_(static_cast<ty*>(std::calloc(sizeof(ty), capacity_))), g_(f_) {}
 
 	explicit loop(std::size_t len)
-		: size_(len * 2),
-		f_(static_cast<ty*>(std::calloc(sizeof(ty), size_))), g_(f_ + len) {
+		: capacity_(len * 2),
+		f_(static_cast<ty*>(std::calloc(sizeof(ty), capacity_))), g_(f_ + len) {
 		for (std::size_t x = 0uz; x < size(); ++x)
 			new (f_ + x) ty();
 	}
 
 	loop(const loop &y)
-		: size_(y.size_),
-		f_(static_cast<ty*>(std::calloc(sizeof(ty), size_))), g_(f_ + y.size()) {
+		: capacity_(y.capacity_),
+		f_(static_cast<ty*>(std::calloc(sizeof(ty), capacity_))), g_(f_ + y.size()) {
 		for (std::size_t x = 0uz; x < size(); ++x)
 			new (f_ + x) ty(y.f_[x]);
 	}
 
 	loop(loop &&y) noexcept
-		: size_(y.size_),
+		: capacity_(y.capacity_),
 		f_(y.f_), g_(y.g_) {
-		y.size_ = 0uz;
+		y.capacity_ = 0uz;
 		y.f_ = y.g_ = nullptr;
 	}
 
@@ -72,8 +72,8 @@ public:
 	loop<ty>& operator=(const loop<ty> &y) {
 		clear();
 
-		size_ = y.size_;
-		f_ = static_cast<ty*>(std::calloc(sizeof(ty), size_));
+		capacity_ = y.capacity_;
+		f_ = static_cast<ty*>(std::calloc(sizeof(ty), capacity_));
 		g_ = f_ + y.size();
 
 		for (std::size_t x = 0uz; x < size(); ++x)
@@ -88,10 +88,10 @@ public:
 
 		clear();
 
-		size_ = y.size_;
+		capacity_ = y.capacity_;
 		f_ = y.f_;
 		g_ = y.g_;
-		y.size_ = 0uz;
+		y.capacity_ = 0uz;
 		y.f_ = y.g_ = nullptr;
 
 		return *this;
@@ -142,7 +142,7 @@ public:
 			f_[x].~ty();
 
 		std::free(f_);
-		size_ = 0;
+		capacity_ = 0;
 		f_ = g_ = nullptr;
 	}
 
