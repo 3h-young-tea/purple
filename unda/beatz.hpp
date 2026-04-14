@@ -9,10 +9,10 @@
 using namespace std::literals;
 
 namespace unda {
-//	https://music.douban.com/subject/36178648/
-//	https://music.douban.com/subject/36776810/
-//	https://music.douban.com/subject/37923198/
-//	https://music.douban.com/subject/37935894/
+// https://music.douban.com/subject/36178648/	// undabeatz vol.1
+// https://music.douban.com/subject/36776810/	// undabeatz vol.2
+// https://music.douban.com/subject/37923198/	// undabeatz vol.3
+// https://music.douban.com/subject/37935894/	// undabeatz vol.4
 
 template <class ty>
 class	uobj_t {	// ultra object
