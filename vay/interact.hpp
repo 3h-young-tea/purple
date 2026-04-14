@@ -20,7 +20,7 @@ public:
 	interact(args&&...arg)
 		: val_(std::make_unique<ty>(std::forward<args>(arg)...)) {}
 
-	~interact(void) noexcept {std::println("{}", *val_);}
+	~interact(void) noexcept {}
 
 	template <class...args>
 	void	touch(const std::shared_ptr<interact<ty>> &ref_this, args&&...arg)
