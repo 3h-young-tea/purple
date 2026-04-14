@@ -50,7 +50,7 @@ public:
 
 	bool	has_ring(void) const noexcept
 		pre(!pre_) {
-		std::map<robj_t<interact<ty>>, bool> book;	// 我爱红黑树, 我爱红黑树, 我爱红黑树, never use idiots hash
+		std::map<robj_t<interact<ty>>, bool> book;	// 我爱红黑树, 我爱红黑树, 我爱红黑树, never use idiot hash
 
 		for (robj_t<interact<ty>> x = nxt_; x; x = x->nxt_) {
 			if (book[x])
