@@ -21,6 +21,14 @@ class	uobj_t {	// ultra object
 	uobj_t(const uobj_t<ty>&) = delete;
 	void operator=(const uobj_t<ty>&) = delete;
 
+	void	pop(void) noexcept {
+		if (x_ == nullptr)
+			return;
+
+		delete x_;
+		x_ = nullptr;
+	}
+
 public:
 	uobj_t(void) noexcept
 		: x_(nullptr) {}
@@ -45,6 +53,12 @@ public:
 		return *this;
 	}
 
+	uobj_t<ty>& operator=(nullptr_t) noexcept {
+		pop();
+
+		return *this;
+	}
+
 	bool	operator<(const uobj_t<ty> &y) const noexcept {
 		return x_ < y.x_;
 	}
@@ -52,14 +66,6 @@ public:
 	void	push(const ty &val) {
 		pop();
 		x_ = new ty(val);
-	}
-
-	void	pop(void) noexcept {
-		if (x_ == nullptr)
-			return;
-
-		delete x_;
-		x_ = nullptr;
 	}
 
 	explicit operator bool(void) const noexcept {
@@ -117,6 +123,16 @@ class	sobj_t {	// super object
 
 	friend class robj_t<ty>;
 
+	void	pop(ty *x, std::atomic<std::size_t> *tot) const noexcept {
+		if (x == nullptr)
+			return;
+
+		if (tot->fetch_sub(1uz, std::memory_order::acq_rel) == 1) {
+			delete x;
+			delete tot;
+		}
+	}
+
 public:
 	sobj_t(void) noexcept
 		: x_(nullptr), tot_(nullptr) {}
@@ -140,30 +156,36 @@ public:
 	}
 
 	~sobj_t(void) noexcept {
-		pop();
+		pop(x_, tot_);
 	}
 
 	sobj_t<ty>& operator=(const sobj_t<ty> &y) noexcept {
 		if (this == &y)
 			return *this;
 
-		pop();
+		auto tmp_x = x_;
+		auto tmp_tot = tot_;
 		x_ = y.x_;
 		tot_ = y.tot_;
-
+		
 		if (x_)
 			tot_->fetch_add(1uz, std::memory_order::relaxed);
+
+		pop(tmp_x, tmp_tot);
 
 		return *this;
 	}
 
 	sobj_t<ty>& operator=(const robj_t<ty> &y) noexcept {
-		pop();
+		auto tmp_x = x_;
+		auto tmp_tot = tot_;
 		x_ = y.x_;
 		tot_ = y.tot_;
 
 		if (x_)
 			tot_->fetch_add(1uz, std::memory_order::relaxed);
+
+		pop(tmp_x, tmp_tot);
 
 		return *this;
 	}
@@ -172,11 +194,19 @@ public:
 		if (this == &y)
 			return *this;
 
-		pop();
+		auto tmp_x = x_;
+		auto tmp_tot = tot_;
 		x_ = y.x_;
 		tot_ = y.tot_;
 		y.x_ = nullptr;
 		y.tot_ = nullptr;
+		pop(tmp_x, tmp_tot);
+
+		return *this;
+	}
+
+	sobj_t<ty>& operator=(nullptr_t) noexcept {
+		pop();
 
 		return *this;
 	}
@@ -187,19 +217,6 @@ public:
 
 	bool	operator<(const robj_t<ty> &y) const noexcept {
 		return x_ < y.x_;
-	}
-
-	void	pop(void) noexcept {
-		if (x_ == nullptr)
-			return;
-
-		if (tot_->fetch_sub(1uz, std::memory_order::acq_rel) == 1) {
-			delete x_;
-			delete tot_;
-		}
-
-		x_ = nullptr;
-		tot_ = nullptr;
 	}
 
 	explicit operator bool(void) const noexcept {
@@ -308,6 +325,13 @@ public:
 		tot_ = y.tot_;
 		y.x_ = nullptr;
 		y.tot_ = nullptr;
+
+		return *this;
+	}
+
+	robj_t<ty>& operator=(nullptr_t) noexcept {
+		x_ = nullptr;
+		tot_ = nullptr;
 
 		return *this;
 	}
