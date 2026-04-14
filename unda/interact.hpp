@@ -24,7 +24,7 @@ public:
 	interact(args&&...arg)
 		: val_(make_uobj<ty>(std::forward<args>(arg)...)) {}
 
-	~interact(void) noexcept {std::println("{}", *val_);}
+	~interact(void) noexcept {}
 
 	template <class ref_ty, class...args>
 	void	touch(const ref_ty &ref_this, args&&...arg)
