@@ -38,6 +38,7 @@ public:
 		: len_(y.length()),
 		s_(new char[len_ + 1uz]) {
 		std::copy(y.begin(), y.end(), s_);
+		s_[len_] = '\0';
 	}
 
 	explicit word(const char *s)
@@ -79,6 +80,7 @@ public:
 		len_ = y.length();
 		s_ = new char[len_ + 1uz];
 		std::copy(y.begin(), y.end(), s_);
+		s_[len_] = '\0';
 
 		return *this;
 	}
