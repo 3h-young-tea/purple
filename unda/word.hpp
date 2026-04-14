@@ -23,8 +23,8 @@ public:
 
 	word(const word &y)
 		: len_(y.len_),
-		s_(new char[len_ + 1]) {
-		std::copy(y.s_, y.s_ + 1 + y.len_, s_);
+		s_(new char[len_ + 1uz]) {
+		std::copy(y.s_, y.s_ + 1uz + y.len_, s_);
 	}
 
 	word(word &&y) noexcept
@@ -36,15 +36,15 @@ public:
 
 	explicit word(const std::string &y)
 		: len_(y.length()),
-		s_(new char[len_ + 1]) {
+		s_(new char[len_ + 1uz]) {
 		std::copy(y.begin(), y.end(), s_);
 	}
 
 	explicit word(const char *s)
 		pre(s)
 		: len_(std::strlen(s)),
-		s_(new char[len_ + 1]) {
-		std::copy(s, s + 1 + len_, s_);
+		s_(new char[len_ + 1uz]) {
+		std::copy(s, s + 1uz + len_, s_);
 	}
 
 	~word(void) noexcept {
@@ -56,8 +56,8 @@ public:
 		delete[] s_;
 
 		len_ = y.len_;
-		s_ = new char[len_ + 1];
-		std::copy(y.s_, y.s_ + 1 + y.len_, s_);
+		s_ = new char[len_ + 1uz];
+		std::copy(y.s_, y.s_ + 1uz + y.len_, s_);
 
 		return *this;
 	}
@@ -77,7 +77,7 @@ public:
 		delete[] s_;
 
 		len_ = y.length();
-		s_ = new char[len_ + 1];
+		s_ = new char[len_ + 1uz];
 		std::copy(y.begin(), y.end(), s_);
 
 		return *this;
@@ -88,10 +88,18 @@ public:
 		delete[] s_;
 
 		len_ = std::strlen(s);
-		s_ = new char[len_ + 1];
-		std::copy(s, s + 1 + len_, s_);
+		s_ = new char[len_ + 1uz];
+		std::copy(s, s + 1uz + len_, s_);
 
 		return *this;
+	}
+
+	bool	operator<(const word &y) const noexcept {
+		for (std::size_t x = 0uz; s_[x] && y.s_[x]; ++x)
+			if (s_[x] != y.s_[x])
+				return s_[x] < y.s_[x];
+
+		return len_ < y.len_;
 	}
 
 	bool	operator==(const word &y) const noexcept {
@@ -148,9 +156,9 @@ public:
 
 		word x;
 		x.len_ = len_ + y.len_;
-		x.s_ = new char[x.len_ + 1];
+		x.s_ = new char[x.len_ + 1uz];
 		std::copy(s_, s_ + len_, x.s_);
-		std::copy(y.s_, y.s_ + 1 + y.len_, x.s_ + len_);
+		std::copy(y.s_, y.s_ + 1uz + y.len_, x.s_ + len_);
 
 		return x;
 	}
@@ -162,9 +170,9 @@ public:
 		std::size_t s_len = std::strlen(s);
 		word x;
 		x.len_ = len_ + s_len;
-		x.s_ = new char[x.len_ + 1];
+		x.s_ = new char[x.len_ + 1uz];
 		std::copy(s_, s_ + len_, x.s_);
-		std::copy(s, s + 1 + s_len, x.s_ + len_);
+		std::copy(s, s + 1uz + s_len, x.s_ + len_);
 
 		return x;
 	}
@@ -173,11 +181,11 @@ public:
 		if (len_ == 0uz)
 			return *this = y;
 
-		char *x = new char[len_ + y.len_ + 1];
+		char *x = new char[len_ + y.len_ + 1uz];
 		std::copy(s_, s_ + len_, x);
 		std::swap(s_, x);	// "ok, 这个哥们现在换到这边, 我听你的说唱就像是在转圈" -- iron mic 2012, 艾热 vs 贝贝
 		delete[] x;
-		std::copy(y.s_, y.s_ + 1 + y.len_, s_ + len_);
+		std::copy(y.s_, y.s_ + 1uz + y.len_, s_ + len_);
 		len_ += y.len_;
 
 		return *this;
@@ -188,11 +196,11 @@ public:
 			return *this = word(s);
 
 		std::size_t s_len = std::strlen(s);
-		char *x = new char[len_ + s_len + 1];
+		char *x = new char[len_ + s_len + 1uz];
 		std::copy(s_, s_ + len_, x);
 		std::swap(s_, x);	// "ok, 这个哥们现在换到这边, 我听你的说唱就像是在转圈" -- iron mic 2012, 艾热 vs 贝贝
 		delete[] x;
-		std::copy(s, s + 1 + s_len, s_ + len_);
+		std::copy(s, s + 1uz + s_len, s_ + len_);
 		len_ += s_len;
 
 		return *this;
@@ -205,7 +213,7 @@ public:
 
 		for (std::size_t x = 1uz, y = 0uz; x < len_; ++x) {
 			while (y && s_[y] != s_[x])
-				y = pi[y - 1];
+				y = pi[y - 1uz];
 
 			pi[x] = y += s_[y] == s_[x];
 		}
@@ -220,11 +228,11 @@ public:
 
 		for (std::size_t x = 0uz, y = 0uz; x < len_; ++x) {
 			while (y && s_[x] != p.s_[y])
-				y = pi[y - 1];
+				y = pi[y - 1uz];
 
 			if ((y += s_[x] == p.s_[y]) == p.len_)
-				taocp.emplace(x - y + 1),
-				y = pi[y - 1];
+				taocp.emplace(x - y + 1uz),
+				y = pi[y - 1uz];
 		}
 
 		return taocp;
@@ -259,7 +267,7 @@ public:
 
 		std::size_t x = 0uz;
 		while ((ch = in.get()) && !in.eof() && !isspace(ch)) {
-			if (x == buf_size - 1)
+			if (x == buf_size - 1uz)
 				buf = static_cast<char*>(std::realloc(buf, buf_size <<= 1));
 
 			buf[x++] = static_cast<char>(ch);
