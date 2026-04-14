@@ -10,7 +10,7 @@
 using namespace std::literals;
 
 namespace unda {
-//	https://music.douban.com/subject/35310799/
+// https://music.douban.com/subject/35310799/	// undaword vol.1
 
 class	word {
 	std::size_t len_;
