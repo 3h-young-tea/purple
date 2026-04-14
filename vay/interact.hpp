@@ -57,21 +57,21 @@ public:
 	}
 
 	bool	has_ring(void) const noexcept
-		pre(!pre_) {
-		std::map<std::weak_ptr<interact<ty>>, bool> book;	// 我爱红黑树, 我爱红黑树, 我爱红黑树, never use idiot hash
+		pre(!pre_.lock()) {
+		std::map<interact<ty>*, bool> book;	// 我爱红黑树, 我爱红黑树, 我爱红黑树, never use idiot hash
 
 		for (std::weak_ptr<interact<ty>> x = nxt_; x.lock(); x = x.lock()->nxt_) {
-			if (book[x])
+			if (book[x.lock().get()])
 				return 1;
 
-			book[x] = 1;
+			book[x.lock().get()] = 1;
 		}
 
 		return 0;
 	}
 
 	std::vector<std::weak_ptr<interact<ty>>> cast_vector(void) const noexcept
-		pre(!pre_ && !has_ring()) {
+		pre(!pre_.lock() && !has_ring()) {
 		std::vector<std::weak_ptr<interact<ty>>> taocp;
 		
 		for (std::weak_ptr<interact<ty>> x = nxt_; x.lock(); x = x.lock()->nxt_)
