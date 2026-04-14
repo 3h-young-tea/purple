@@ -206,7 +206,7 @@ public:
 	}
 
 	sobj_t<ty>& operator=(nullptr_t) noexcept {
-		pop();
+		pop(x_, tot_);
 
 		return *this;
 	}
