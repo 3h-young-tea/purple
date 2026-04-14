@@ -9,8 +9,8 @@
 using namespace std::literals;
 
 namespace unda {
-//	https://music.douban.com/subject/35924930/
-//	https://music.douban.com/subject/36241994/
+// https://music.douban.com/subject/35924930/	// undaloop - wtf
+// https://music.douban.com/subject/36241994/	// undaloop - ftw
 
 template <class ty>
 class	loop {
