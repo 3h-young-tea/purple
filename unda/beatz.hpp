@@ -102,7 +102,7 @@ public:
 	template <class typ, class...args>
 	friend uobj_t<typ> make_uobj(args&&...val) {
 		uobj_t<typ> x;
-		x.x_ = new typ(std::forward<args&&>(val)...);
+		x.x_ = new typ(std::forward<args>(val)...);
 		return x;
 	}
 };
