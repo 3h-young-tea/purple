@@ -53,7 +53,7 @@ public:
 		if (nxt_)
 			nxt_->pre_ = pre_;
 
-		pre_.lock()->nxt_ = nxt_;
+		pre_.lock()->nxt_ = std::move(nxt_);
 	}
 
 	bool	has_ring(void) const noexcept
