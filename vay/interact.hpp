@@ -24,7 +24,7 @@ public:
 
 	template <class...args>
 	void	touch(const std::shared_ptr<interact<ty>> &ref_this, args&&...arg)
-		pre(&*ref_this == this) {
+		pre(ref_this.get() == this) {
 		auto x = std::make_shared<interact<ty>>(std::forward<args>(arg)...);
 		x->pre_ = ref_this;
 		x->nxt_ = std::move(nxt_);
@@ -37,7 +37,7 @@ public:
 
 	template <class...args>
 	void	touch(const std::weak_ptr<interact<ty>> &ref_this, args&&...arg)
-		pre(&*ref_this.lock() == this) {
+		pre(ref_this.lock().get() == this) {
 		auto x = std::make_shared<interact<ty>>(std::forward<args>(arg)...);
 		x->pre_ = ref_this.lock();
 		x->nxt_ = std::move(nxt_);
@@ -71,13 +71,22 @@ public:
 	}
 
 	std::vector<std::weak_ptr<interact<ty>>> cast_vector(void) const noexcept
-		pre(!pre_.lock() && !has_ring()) {
+		pre(!pre_.lock()) {
 		std::vector<std::weak_ptr<interact<ty>>> taocp;
 		
 		for (std::weak_ptr<interact<ty>> x = nxt_; x.lock(); x = x.lock()->nxt_)
 			taocp.emplace_back(x);
 
 		return taocp;
+	}
+
+	std::expected<std::weak_ptr<interact<ty>>, nullptr_t> contains(const ty& t) const noexcept
+		pre(!pre_.lock()) {
+		for (std::weak_ptr<interact<ty>> x = nxt_; x.lock(); x = x.lock()->nxt_)
+			if (*x.lock()->val_ == t)
+				return x;
+
+		return std::unexpected<nullptr_t>(nullptr);
 	}
 };
 }
