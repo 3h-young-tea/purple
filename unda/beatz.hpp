@@ -119,15 +119,15 @@ class	robj_t;
 template <class ty>
 class	sobj_t {	// super object
 	ty *x_;
-	std::atomic<std::size_t> *tot_;
+	std::atomic<long> *tot_;
 
 	friend class robj_t<ty>;
 
-	void	pop(ty *x, std::atomic<std::size_t> *tot) const noexcept {
+	void	pop(ty *x, std::atomic<long> *tot) const noexcept {
 		if (x == nullptr)
 			return;
 
-		if (tot->fetch_sub(1uz, std::memory_order::acq_rel) == 1) {
+		if (tot->fetch_sub(1z, std::memory_order::acq_rel) == 1z) {
 			delete x;
 			delete tot;
 		}
@@ -140,13 +140,13 @@ public:
 	sobj_t(const sobj_t<ty> &y) noexcept
 		: x_(y.x_), tot_(y.tot_) {
 		if (x_)
-			tot_->fetch_add(1uz, std::memory_order::relaxed);
+			tot_->fetch_add(1z, std::memory_order::relaxed);
 	}
 
 	sobj_t(const robj_t<ty> &y) noexcept
 		: x_(y.x_), tot_(y.tot_) {
 		if (x_)
-			tot_->fetch_add(1uz, std::memory_order::relaxed);
+			tot_->fetch_add(1z, std::memory_order::relaxed);
 	}
 
 	sobj_t(sobj_t<ty> &&y) noexcept
@@ -169,7 +169,7 @@ public:
 		tot_ = y.tot_;
 		
 		if (x_)
-			tot_->fetch_add(1uz, std::memory_order::relaxed);
+			tot_->fetch_add(1z, std::memory_order::relaxed);
 
 		pop(tmp_x, tmp_tot);
 
@@ -183,7 +183,7 @@ public:
 		tot_ = y.tot_;
 
 		if (x_)
-			tot_->fetch_add(1uz, std::memory_order::relaxed);
+			tot_->fetch_add(1z, std::memory_order::relaxed);
 
 		pop(tmp_x, tmp_tot);
 
@@ -247,7 +247,7 @@ public:
 	friend sobj_t<typ> make_sobj(void) {
 		sobj_t<typ> x;
 		x.x_ = new typ();
-		x.tot_ = new std::atomic<std::size_t>(1uz);
+		x.tot_ = new std::atomic<long>(1z);
 		return x;
 	}
 
@@ -255,7 +255,7 @@ public:
 	friend sobj_t<typ> make_sobj(args&&...val) {
 		sobj_t<typ> x;
 		x.x_ = new typ(std::forward<args>(val)...);
-		x.tot_ = new std::atomic<std::size_t>(1uz);
+		x.tot_ = new std::atomic<long>(1z);
 		return x;
 	}
 };
@@ -275,7 +275,7 @@ sobj_t<typ> make_sobj(args&&...);
 template <class ty>
 class	robj_t {	// rare object
 	ty *x_;
-	std::atomic<std::size_t> *tot_;
+	std::atomic<long> *tot_;
 
 	friend class sobj_t<ty>;
 
