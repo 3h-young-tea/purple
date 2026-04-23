@@ -8,7 +8,7 @@
 
 using namespace std::literals;
 
-namespace vay {
+namespace fs {	// shout out 2 [_fusu](https://codeforces.com/profile/_Fusu) who taught me pointaz
 template <class ty>
 class	interact {
 public:
@@ -19,8 +19,6 @@ public:
 	template <class...args>
 	interact(args&&...arg)
 		: val_(std::make_unique<ty>(std::forward<args>(arg)...)) {}
-
-	~interact(void) noexcept {}
 
 	template <class...args>
 	void	touch(const std::shared_ptr<interact<ty>> &ref_this, args&&...arg)
@@ -58,7 +56,7 @@ public:
 
 	bool	has_ring(void) const noexcept
 		pre(!pre_.lock()) {
-		std::map<interact<ty>*, bool> book;	// 我爱红黑树, 我爱红黑树, 我爱红黑树, never use idiot hash
+		std::map<interact<ty>*, bool> book;	// 我爱红黑树, i will never use idiot hash
 
 		for (std::weak_ptr<interact<ty>> x = nxt_; x.lock(); x = x.lock()->nxt_) {
 			if (book[x.lock().get()])
@@ -72,12 +70,12 @@ public:
 
 	std::vector<std::weak_ptr<interact<ty>>> cast_vector(void) const noexcept
 		pre(!pre_.lock()) {
-		std::vector<std::weak_ptr<interact<ty>>> taocp;
+		std::vector<std::weak_ptr<interact<ty>>> rax;
 		
 		for (std::weak_ptr<interact<ty>> x = nxt_; x.lock(); x = x.lock()->nxt_)
-			taocp.emplace_back(x);
+			rax.emplace_back(x);
 
-		return taocp;
+		return rax;
 	}
 
 	std::expected<std::weak_ptr<interact<ty>>, nullptr_t> contains(const ty& t) const noexcept
