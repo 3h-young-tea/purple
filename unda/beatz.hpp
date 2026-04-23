@@ -38,6 +38,13 @@ public:
 		y.x_ = nullptr;
 	}
 
+	explicit uobj_t(ty *y) noexcept
+		: x_(y) {}
+
+	template <class...args>
+	uobj_t(args&&...val)
+		: x_(new ty(std::forward<args>(val)...)) {}
+
 	~uobj_t(void) noexcept {
 		pop();
 	}
@@ -63,11 +70,6 @@ public:
 		return x_ < y.x_;
 	}
 
-	void	push(const ty &val) {
-		pop();
-		x_ = new ty(val);
-	}
-
 	explicit operator bool(void) const noexcept {
 		return x_ != nullptr;
 	}
@@ -91,27 +93,19 @@ public:
 		pre(x_) {
 		return *x_;
 	}
-
-	template <class typ>
-	friend uobj_t<typ> make_uobj(void) {
-		uobj_t<typ> x;
-		x.x_ = new typ();
-		return x;
-	}
-
-	template <class typ, class...args>
-	friend uobj_t<typ> make_uobj(args&&...val) {
-		uobj_t<typ> x;
-		x.x_ = new typ(std::forward<args>(val)...);
-		return x;
-	}
 };
 
 template <class typ>
-uobj_t<typ> make_uobj(void);
+uobj_t<typ> make_uobj(void) {
+	uobj_t<typ> x(new typ());
+	return x;
+}
 
 template <class typ, class...args>
-uobj_t<typ> make_uobj(args&&...);
+uobj_t<typ> make_uobj(args&&...val) {
+	uobj_t<typ> x(new typ(std::forward<args>(val)...));
+	return x;
+}
 
 template <class ty>
 class	robj_t;
@@ -154,6 +148,14 @@ public:
 		y.x_ = nullptr;
 		y.tot_ = nullptr;
 	}
+
+	explicit sobj_t(ty *y) noexcept
+		: x_(y), tot_(new std::atomic<long>(1z)) {}
+
+	template <class...args>
+	sobj_t(args&&...val)
+		: x_(new ty(std::forward<args>(val)...)),
+		tot_(new std::atomic<long>(1z)) {}
 
 	~sobj_t(void) noexcept {
 		pop(x_, tot_);
@@ -242,35 +244,19 @@ public:
 		pre(x_) {
 		return *x_;
 	}
-
-	template <class typ>
-	friend sobj_t<typ> make_sobj(void) {
-		sobj_t<typ> x;
-		x.x_ = new typ();
-		x.tot_ = new std::atomic<long>(1z);
-		return x;
-	}
-
-	template <class typ, class...args>
-	friend sobj_t<typ> make_sobj(args&&...val) {
-		sobj_t<typ> x;
-		x.x_ = new typ(std::forward<args>(val)...);
-		x.tot_ = new std::atomic<long>(1z);
-		return x;
-	}
 };
 
 template <class typ>
-sobj_t<typ> make_sobj(void);
+sobj_t<typ> make_sobj(void) {
+	sobj_t<typ> x(new typ());
+	return x;
+}
 
 template <class typ, class...args>
-sobj_t<typ> make_sobj(args&&...);
-
-/*	这个 rare object 的语义是, 我拥有这个东西, 但是我拒绝参与引用计数
- *	简单来说, 我拥有这个东西, 那我就不应该是观察者, i`m da masta
- *	所以每次使用前不用检查 if (ptr), 直接用就行了
- *	主要用途之一是你可以用于记录双链表的前一个顶点, 如果前一个顶点不存在就说明你把代码写炸了 (例外就是, 头顶点没有前一个顶点)
- */
+sobj_t<typ> make_sobj(args&&...val) {
+	sobj_t<typ> x(new typ(std::forward<args>(val)...));
+	return x;
+}
 
 template <class ty>
 class	robj_t {	// rare object
